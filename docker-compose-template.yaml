@@ -1,0 +1,261 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for Hive Metastore and JuiceFS metadata
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./.config/postgres:/docker-entrypoint-initdb.d:ro
+    networks:
+      - bigdata-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # JuiceFS mount service using juicedata/mount image with OSS storage
+  juicefs:
+    image: juicedata/mount:ce-v1.2.4
+    container_name: juicefs-mount
+    privileged: true
+    environment:
+      - META_PASSWORD=postgres123
+      - OSS_BUCKET=https://violet-feed-r.oss-cn-beijing.aliyuncs.com
+      - OSS_ACCESS_KEY=  # Fill in your OSS access key
+      - OSS_SECRET_KEY=  # Fill in your OSS secret key
+    volumes:
+      - /tmp/juicefs-mount:/mnt
+      - ./.config/juicefs/entrypoint.sh:/entrypoint.sh:ro
+    networks:
+      - bigdata-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh /entrypoint.sh
+    healthcheck:
+      test: ["CMD-SHELL", "stat /mnt/.config || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Hive Metastore
+  hive-metastore:
+    image: apache/hive:4.0.0
+    container_name: hive-metastore
+    environment:
+      SERVICE_NAME: metastore
+      DB_DRIVER: postgres
+      SERVICE_OPTS: >-
+        -Djavax.jdo.option.ConnectionDriverName=org.postgresql.Driver
+        -Djavax.jdo.option.ConnectionURL=jdbc:postgresql://postgres:5432/metastore
+        -Djavax.jdo.option.ConnectionUserName=hive
+        -Djavax.jdo.option.ConnectionPassword=hive123
+      HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
+    ports:
+      - "9083:9083"
+    volumes:
+      - /tmp/juicefs-mount:/mnt
+      - ./.config/hive/lib/postgresql-42.7.3.jar:/opt/hive/lib/postgresql-42.7.3.jar:ro
+      - ./.config/hive/lib/juicefs-hadoop-1.2.4.jar:/opt/hive/lib/juicefs-hadoop-1.2.4.jar:ro
+      - ./.config/hive/lib/juicefs-hadoop-1.2.4.jar:/opt/hadoop/lib/native/juicefs-hadoop-1.2.4.jar:ro
+      - ./.config/hive/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
+    networks:
+      - bigdata-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      juicefs:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # HiveServer2
+  hiveserver2:
+    image: apache/hive:4.0.0
+    container_name: hiveserver2
+    environment:
+      SERVICE_NAME: hiveserver2
+      SERVICE_OPTS: >-
+        -Dhive.metastore.uris=thrift://hive-metastore:9083
+        -Dhive.server2.thrift.bind.host=0.0.0.0
+        -Dhive.server2.thrift.port=10000
+      HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
+      HADOOP_CLASSPATH: /opt/hive/lib/juicefs-hadoop-1.2.4.jar
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+    volumes:
+      - /tmp/juicefs-mount:/mnt
+      - ./.config/hive/hive-site.xml:/opt/hive/conf/hive-site.xml:ro
+      - ./.config/hive/lib/juicefs-hadoop-1.2.4.jar:/opt/hive/lib/juicefs-hadoop-1.2.4.jar:ro
+      - ./.config/hive/lib/juicefs-hadoop-1.2.4.jar:/opt/hadoop/share/hadoop/common/lib/juicefs-hadoop-1.2.4.jar:ro
+      - ./.config/hive/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
+    networks:
+      - bigdata-net
+    depends_on:
+      - hive-metastore
+      - spark
+    command: >
+      bash -c "
+        mkdir -p /tmp/hive-local &&
+        chmod -R 777 /tmp/hive-local &&
+        hadoop fs -mkdir -p jfs://feedjfs/tmp/hive 2>/dev/null || true &&
+        hadoop fs -chmod -R 777 jfs://feedjfs/tmp 2>/dev/null || true &&
+        /entrypoint.sh
+      "
+    restart: unless-stopped
+
+  # Kafka 4.0 (KRaft mode - no Zookeeper needed)
+  kafka:
+    image: apache/kafka:4.0.0
+    container_name: kafka
+    hostname: kafka
+    user: root
+    ports:
+      - "9092:9092"     # Kafka broker (external)
+      - "9093:9093"     # Kafka broker (internal)
+      - "9094:9094"     # Kafka controller
+    environment:
+      # KRaft mode configuration
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9094,PLAINTEXT_INTERNAL://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9094
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+      # Storage configuration
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      # Performance tuning
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      # Enable auto topic creation
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+      - /tmp/juicefs-mount:/mnt
+    networks:
+      - bigdata-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Kafka UI - Web interface for Kafka management
+  kafka-ui:
+    image: rootpublic/kafka-ui:0.7.2
+    container_name: kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      DYNAMIC_CONFIG_ENABLED: "true"
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
+    networks:
+      - bigdata-net
+    depends_on:
+      - kafka
+    restart: unless-stopped
+
+  # ClickHouse 25.9.4 - OLAP Database
+  clickhouse:
+    image: clickhouse:25.9.4
+    container_name: clickhouse
+    hostname: clickhouse
+    ports:
+      - "8123:8123"     # HTTP interface
+      - "9000:9000"     # Native protocol
+    environment:
+      CLICKHOUSE_USER: admin
+      CLICKHOUSE_PASSWORD: clickhouse123
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+    networks:
+      - bigdata-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Spark Standalone (Master + Worker in one container)
+  spark:
+    image: spark:4.0.0-java21-python3
+    container_name: spark-standalone
+    hostname: spark
+    environment:
+      - SPARK_MODE=standalone
+      - SPARK_MASTER_HOST=spark
+      - SPARK_WORKER_CORES=4
+      - SPARK_WORKER_MEMORY=4g
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=/tmp/spark-events
+    ports:
+      - "7077:7077"     # Spark Master port
+      - "8080:8080"     # Spark Master WebUI
+      - "8081:8081"     # Spark Worker WebUI
+      - "4040:4040"     # Spark Application UI
+      - "18080:18080"   # Spark History Server
+    volumes:
+      - /tmp/juicefs-mount:/mnt
+      - spark-apps:/opt/spark-apps
+      - spark-data:/opt/spark-data
+      - spark-events:/tmp/spark-events
+      - spark-home:/home/spark
+      - ./.config/hive/lib/juicefs-hadoop-1.2.4.jar:/opt/spark/jars/juicefs-hadoop-1.2.4.jar:ro
+      - ./.config/hive/core-site.xml:/opt/spark/conf/core-site.xml:ro
+      - ./.config/spark/hive-site.xml:/opt/spark/conf/hive-site.xml:ro
+      - ./.config/hive/lib-4.0.0/lib:/tmp/hive-4.0.0-libs:ro
+      - ./.config/spark/upgrade-hive-libs.sh:/tmp/upgrade-hive-libs.sh:ro
+      - ./.config/spark/kafka-jars/commons-pool2-2.12.0.jar:/opt/spark/jars/commons-pool2-2.12.0.jar:ro
+    networks:
+      - bigdata-net
+    depends_on:
+      juicefs:
+        condition: service_healthy
+      hive-metastore:
+        condition: service_started
+    command: >
+      bash -c "
+        bash /tmp/upgrade-hive-libs.sh
+        mkdir -p /tmp/spark-events
+        mkdir -p /home/spark
+        mkdir -p /home/spark/.ivy2/cache
+        chown -R spark:spark /home/spark /tmp/spark-events 2>/dev/null || true
+        /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master &
+        /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark:7077 &
+        /opt/spark/bin/spark-class org.apache.spark.deploy.history.HistoryServer &
+        wait
+      "
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  kafka-data:
+  clickhouse-data:
+  spark-apps:
+  spark-data:
+  spark-events:
+  spark-home:
+
+networks:
+  bigdata-net:
+    driver: bridge

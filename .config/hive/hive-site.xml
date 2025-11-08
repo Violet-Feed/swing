@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <!-- Hive Execution Engine Configuration -->
+  <property>
+    <name>hive.execution.engine</name>
+    <value>spark</value>
+    <description>Use Spark as the execution engine instead of Tez</description>
+  </property>
+
+  <!-- Spark Configuration -->
+  <property>
+    <name>spark.master</name>
+    <value>spark://spark:7077</value>
+    <description>Spark master URL</description>
+  </property>
+
+  <property>
+    <name>spark.eventLog.enabled</name>
+    <value>true</value>
+    <description>Enable Spark event logging</description>
+  </property>
+
+  <property>
+    <name>spark.eventLog.dir</name>
+    <value>/tmp/spark-events</value>
+    <description>Spark event log directory</description>
+  </property>
+
+  <property>
+    <name>spark.serializer</name>
+    <value>org.apache.spark.serializer.KryoSerializer</value>
+    <description>Use Kryo serializer for better performance</description>
+  </property>
+
+  <property>
+    <name>spark.executor.memory</name>
+    <value>2g</value>
+    <description>Memory per executor</description>
+  </property>
+
+  <property>
+    <name>spark.executor.cores</name>
+    <value>2</value>
+    <description>Cores per executor</description>
+  </property>
+
+  <property>
+    <name>spark.executor.instances</name>
+    <value>2</value>
+    <description>Number of executors</description>
+  </property>
+
+  <!-- Hive Metastore Configuration -->
+  <property>
+    <name>hive.metastore.uris</name>
+    <value>thrift://hive-metastore:9083</value>
+    <description>Hive metastore URI</description>
+  </property>
+
+  <!-- HiveServer2 Configuration -->
+  <property>
+    <name>hive.server2.thrift.bind.host</name>
+    <value>0.0.0.0</value>
+    <description>Bind HiveServer2 to all interfaces</description>
+  </property>
+
+  <property>
+    <name>hive.server2.thrift.port</name>
+    <value>10000</value>
+    <description>HiveServer2 Thrift port</description>
+  </property>
+
+  <!-- Hive Warehouse Configuration -->
+  <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>jfs://feedjfs/warehouse</value>
+    <description>Hive warehouse directory on JuiceFS via Hadoop SDK</description>
+  </property>
+
+  <!-- Performance Tuning -->
+  <property>
+    <name>hive.vectorized.execution.enabled</name>
+    <value>true</value>
+    <description>Enable vectorized query execution</description>
+  </property>
+
+  <property>
+    <name>hive.vectorized.execution.reduce.enabled</name>
+    <value>true</value>
+    <description>Enable vectorized execution for reduce</description>
+  </property>
+
+  <!-- Scratch Directory Configuration -->
+  <property>
+    <name>hive.exec.scratchdir</name>
+    <value>jfs://feedjfs/tmp/hive</value>
+    <description>Hive scratch directory on JuiceFS</description>
+  </property>
+
+  <property>
+    <name>hive.exec.local.scratchdir</name>
+    <value>/tmp/hive-local</value>
+    <description>Local scratch directory</description>
+  </property>
+
+  <property>
+    <name>hive.scratch.dir.permission</name>
+    <value>777</value>
+    <description>Scratch directory permission</description>
+  </property>
+
+  <!-- Disable strict permission check -->
+  <property>
+    <name>hive.security.authorization.enabled</name>
+    <value>false</value>
+    <description>Disable authorization to avoid permission check issues</description>
+  </property>
+
+  <!-- Skip HDFS permission check -->
+  <property>
+    <name>hive.exec.submitviachild</name>
+    <value>false</value>
+  </property>
+
+  <property>
+    <name>hive.metastore.schema.verification</name>
+    <value>false</value>
+  </property>
+</configuration>

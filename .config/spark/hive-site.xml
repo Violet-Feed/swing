@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <!-- Hive Metastore Configuration -->
+  <property>
+    <name>hive.metastore.uris</name>
+    <value>thrift://hive-metastore:9083</value>
+    <description>Hive metastore URI for Spark to connect</description>
+  </property>
+
+  <!-- Hive Warehouse Configuration -->
+  <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>jfs://feedjfs/warehouse</value>
+    <description>Hive warehouse directory on JuiceFS</description>
+  </property>
+
+  <!-- Enable Hive support in Spark -->
+  <property>
+    <name>spark.sql.catalogImplementation</name>
+    <value>hive</value>
+    <description>Use Hive catalog implementation</description>
+  </property>
+
+  <!-- Hive execution engine -->
+  <property>
+    <name>hive.execution.engine</name>
+    <value>spark</value>
+    <description>Use Spark as execution engine</description>
+  </property>
+
+  <!-- Spark Hive Metastore Version Configuration -->
+  <property>
+    <name>spark.sql.hive.metastore.version</name>
+    <value>4.0.0</value>
+    <description>Hive Metastore version to use (Spark supports 4.0.0-4.0.1)</description>
+  </property>
+
+  <property>
+    <name>spark.sql.hive.metastore.jars</name>
+    <value>builtin</value>
+    <description>Use builtin (bundled) Hive jars from /opt/spark/jars</description>
+  </property>
+
+  <!-- Performance and compatibility settings -->
+  <property>
+    <name>hive.vectorized.execution.enabled</name>
+    <value>true</value>
+    <description>Enable vectorized query execution</description>
+  </property>
+
+  <property>
+    <name>hive.cbo.enable</name>
+    <value>true</value>
+    <description>Enable cost-based optimizer</description>
+  </property>
+
+  <property>
+    <name>hive.stats.autogather</name>
+    <value>true</value>
+    <description>Auto gather statistics</description>
+  </property>
+
+  <!-- Metastore connection settings -->
+  <property>
+    <name>hive.metastore.client.socket.timeout</name>
+    <value>600</value>
+    <description>Metastore client socket timeout in seconds</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.client.connect.retry.delay</name>
+    <value>5</value>
+    <description>Number of seconds to wait between metastore connect retries</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.schema.verification</name>
+    <value>false</value>
+    <description>Disable schema verification for Hive 4 compatibility</description>
+  </property>
+</configuration>

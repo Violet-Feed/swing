@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+  <!-- Default FileSystem - keep local filesystem as default -->
+  <property>
+    <name>fs.defaultFS</name>
+    <value>file:///</value>
+    <description>Default filesystem - local filesystem</description>
+  </property>
+
+  <!-- JuiceFS FileSystem Implementation -->
+  <property>
+    <name>fs.jfs.impl</name>
+    <value>io.juicefs.JuiceFileSystem</value>
+    <description>JuiceFS implementation class</description>
+  </property>
+
+  <property>
+    <name>fs.AbstractFileSystem.jfs.impl</name>
+    <value>io.juicefs.JuiceFS</value>
+    <description>JuiceFS AbstractFileSystem implementation</description>
+  </property>
+
+  <!-- JuiceFS Metadata Configuration -->
+  <property>
+    <name>juicefs.meta</name>
+    <value>postgres://postgres:postgres123@postgres:5432/juicefs?sslmode=disable</value>
+    <description>JuiceFS metadata engine URL</description>
+  </property>
+
+  <!-- JuiceFS Cache Configuration -->
+  <property>
+    <name>juicefs.cache-dir</name>
+    <value>/tmp/juicefs-cache</value>
+    <description>JuiceFS local cache directory</description>
+  </property>
+
+  <property>
+    <name>juicefs.cache-size</name>
+    <value>1024</value>
+    <description>JuiceFS cache size in MB</description>
+  </property>
+</configuration>
