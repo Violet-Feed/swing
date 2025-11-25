@@ -56,6 +56,7 @@ DEFAULT_KAFKA_PACKAGES = ",".join([
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description="从 Kafka 导入行为数据到 Hive（按日分区）")
+    # todo:修改kafka地址
     parser.add_argument("--bootstrap-servers", default="kafka:9093", help="Kafka 服务器地址（默认: kafka:9093）")
     parser.add_argument("--topic", required=True, help="Kafka 主题名称")
     parser.add_argument("--p-date", required=True, help="分区日期，格式 yyyyMMdd")
