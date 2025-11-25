@@ -51,7 +51,7 @@ services:
 
   # Hive Metastore
   hive-metastore:
-    image: apache/hive:4.0.0
+    image: apache/hive:4.0.1
     container_name: hive-metastore
     environment:
       SERVICE_NAME: metastore
