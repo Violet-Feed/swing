@@ -19,7 +19,7 @@
 ```xml
 <property>
   <name>spark.sql.hive.metastore.version</name>
-  <value>4.0.0</value>
+  <value>4.0.1</value>
 </property>
 ```
 
@@ -42,7 +42,7 @@
 Spark 的 Hive 配置文件，已包含以下关键配置：
 
 **核心配置：**
-- Metastore 版本: `4.0.0`
+- Metastore 版本: `4.0.1`
 - Metastore URI: `thrift://hive-metastore:9083`
 - Warehouse 目录: `jfs://feedjfs/warehouse`
 - JAR 包来源: `maven`（自动下载）
@@ -90,7 +90,7 @@ from pyspark.sql import SparkSession
 spark = SparkSession.builder \
     .appName("YourApp") \
     .config("spark.sql.catalogImplementation", "hive") \
-    .config("spark.sql.hive.metastore.version", "4.0.0") \
+    .config("spark.sql.hive.metastore.version", "4.0.1") \
     .config("spark.sql.hive.metastore.jars", "maven") \
     .config("hive.metastore.uris", "thrift://hive-metastore:9083") \
     .enableHiveSupport() \
@@ -108,7 +108,7 @@ spark.sql("SELECT * FROM test").show()
 ```bash
 spark-submit \
   --conf spark.sql.catalogImplementation=hive \
-  --conf spark.sql.hive.metastore.version=4.0.0 \
+  --conf spark.sql.hive.metastore.version=4.0.1 \
   --conf spark.sql.hive.metastore.jars=maven \
   --conf hive.metastore.uris=thrift://hive-metastore:9083 \
   your_script.py
@@ -125,25 +125,25 @@ IllegalArgumentException: '4.1.0' in spark.sql.hive.metastore.version is invalid
 **原因：** Spark 4.0.0 只支持 Hive 4.0.0-4.0.1，不支持 4.1.0。
 
 **解决方法：**
-1. 将 Hive Metastore 降级到 4.0.0（推荐）：
+1. 将 Hive Metastore 调整为 4.0.1（推荐）：
    ```yaml
    # docker-compose.yaml
    hive-metastore:
-     image: apache/hive:4.0.0
+     image: apache/hive:4.0.1
    ```
 
-2. 配置 Spark 使用 Hive 4.0.0：
+2. 配置 Spark 使用 Hive 4.0.1：
    ```xml
    <property>
      <name>spark.sql.hive.metastore.version</name>
-     <value>4.0.0</value>
+     <value>4.0.1</value>
    </property>
    ```
 
 ### 问题 2: Maven 下载 JAR 包失败
 **错误信息：**
 ```
-Failed to download org.apache.hive:hive-metastore:4.0.0
+Failed to download org.apache.hive:hive-metastore:4.0.1
 ```
 
 **解决方法：**
@@ -170,7 +170,7 @@ HiveException: Unable to fetch table action. Invalid method name: 'get_table'
 **解决方法：**
 确保配置了正确的版本：
 ```python
-.config("spark.sql.hive.metastore.version", "4.0.0")
+.config("spark.sql.hive.metastore.version", "4.0.1")
 .config("spark.sql.hive.metastore.jars", "maven")
 ```
 
