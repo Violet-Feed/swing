@@ -38,8 +38,8 @@
 
   <property>
     <name>spark.sql.hive.metastore.jars</name>
-    <value>builtin</value>
-    <description>Use builtin (bundled) Hive jars from /opt/spark/jars</description>
+    <value>maven</value>
+    <description>Download Hive jars from Maven inside the container</description>
   </property>
 
   <!-- Performance and compatibility settings -->

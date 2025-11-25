@@ -18,6 +18,8 @@ Hive 7天点击行为聚合 ETL
 运行:
   docker exec spark-standalone /opt/spark/bin/spark-submit \
     --master spark://spark:7077 \
+    --conf spark.sql.hive.metastore.version=4.0.0 \
+    --conf spark.sql.hive.metastore.jars=maven \
     --conf spark.sql.catalogImplementation=hive \
     --conf spark.sql.warehouse.dir=jfs://feedjfs/warehouse \
     --conf hive.metastore.uris=thrift://hive-metastore:9083 \
@@ -75,7 +77,7 @@ def main(argv=None):
         .config("hive.metastore.uris", opt.metastore_uri)
         .config("spark.sql.warehouse.dir", opt.warehouse_dir)
         .config("spark.sql.hive.metastore.version", "4.0.0")
-        .config("spark.sql.hive.metastore.jars", "builtin")
+        .config("spark.sql.hive.metastore.jars", "maven")
         .config("spark.sql.sources.partitionOverwriteMode", "dynamic")
         .config("spark.sql.parquet.compression.codec", "snappy")
         .config("hive.metastore.schema.verification", "false")

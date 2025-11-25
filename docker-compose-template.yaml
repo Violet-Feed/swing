@@ -202,6 +202,7 @@ services:
     image: spark:4.0.0-java21-python3
     container_name: spark-standalone
     hostname: spark
+    user: root
     environment:
       - SPARK_MODE=standalone
       - SPARK_MASTER_HOST=spark
@@ -223,9 +224,6 @@ services:
       - ./.config/hive/lib/juicefs-hadoop-1.2.4.jar:/opt/spark/jars/juicefs-hadoop-1.2.4.jar:ro
       - ./.config/hive/core-site.xml:/opt/spark/conf/core-site.xml:ro
       - ./.config/spark/hive-site.xml:/opt/spark/conf/hive-site.xml:ro
-      - ./.config/hive/lib-4.0.0/lib:/tmp/hive-4.0.0-libs:ro
-      - ./.config/spark/upgrade-hive-libs.sh:/tmp/upgrade-hive-libs.sh:ro
-      - ./.config/spark/kafka-jars/commons-pool2-2.12.0.jar:/opt/spark/jars/commons-pool2-2.12.0.jar:ro
     networks:
       - bigdata-net
     depends_on:
@@ -235,7 +233,6 @@ services:
         condition: service_started
     command: >
       bash -c "
-        bash /tmp/upgrade-hive-libs.sh
         mkdir -p /tmp/spark-events
         mkdir -p /home/spark
         mkdir -p /home/spark/.ivy2/cache

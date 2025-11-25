@@ -16,7 +16,9 @@ Spark 批处理任务: 从 Kafka 摄取行为事件数据到 Hive 分区表 (p_d
 运行:
   docker exec spark-standalone /opt/spark/bin/spark-submit \
     --master spark://spark:7077 \
-    --packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.0,org.apache.spark:spark-token-provider-kafka-0-10_2.13:4.0.0,org.apache.kafka:kafka-clients:3.8.1 \
+    --packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.0,org.apache.spark:spark-token-provider-kafka-0-10_2.13:4.0.0,org.apache.kafka:kafka-clients:3.8.1,org.apache.commons:commons-pool2:2.12.0 \
+    --conf spark.sql.hive.metastore.version=4.0.0 \
+    --conf spark.sql.hive.metastore.jars=maven \
     --conf spark.sql.catalogImplementation=hive \
     --conf spark.sql.warehouse.dir=jfs://feedjfs/warehouse \
     --conf hive.metastore.uris=thrift://hive-metastore:9083 \
