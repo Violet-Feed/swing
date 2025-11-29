@@ -31,9 +31,9 @@ Swing 协同过滤推荐算法 - 高性能优化版本
     --conf hive.metastore.uris=thrift://hive-metastore:9083 \
     /opt/spark-apps/swing.py \
       --src-db dwd \
-      --src-table click7aggre1 \
+      --src-table click7aggre \
       --dst-db dwd \
-      --dst-table swing2 \
+      --dst-table swing \
       --alpha 1.0 \
       --top-k 100 \
       --user-cap 200
@@ -59,6 +59,7 @@ try:
 except ImportError:
     print("pandas not found, installing...")
     import subprocess
+    # 这里会出问题，暂且不知道原因，需要容器内手动安装pandas
     subprocess.check_call([sys.executable, "-m", "pip3", "install", "pandas", "pyarrow", "--break-system-packages"])
     import pandas as pd
 
