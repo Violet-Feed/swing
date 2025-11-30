@@ -9,6 +9,8 @@ wheels/
 # Virtual environments
 .venv
 
+violet/
+
 *.jar
 
 docker-compose.yaml
