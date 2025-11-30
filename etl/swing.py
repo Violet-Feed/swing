@@ -24,7 +24,7 @@ Swing 协同过滤推荐算法 - 高性能优化版本
 运行:
   docker exec spark-standalone /opt/spark/bin/spark-submit \
     --master spark://spark:7077 \
-    --conf spark.sql.hive.metastore.version=4.0.1 \
+    --conf spark.sql.hive.metastore.version=3.1.3 \
     --conf spark.sql.hive.metastore.jars=maven \
     --conf spark.sql.catalogImplementation=hive \
     --conf spark.sql.warehouse.dir=jfs://feedjfs/warehouse \
@@ -96,7 +96,7 @@ def main(argv=None):
         .config("spark.sql.parquet.compression.codec", "snappy")
         .config("hive.metastore.uris", args.metastore_uri)
         .config("spark.sql.warehouse.dir", args.warehouse_dir)
-        .config("spark.sql.hive.metastore.version", "4.0.1")
+        .config("spark.sql.hive.metastore.version", "3.1.3")
         .config("spark.sql.hive.metastore.jars", "maven")
         .config("hive.metastore.schema.verification", "false")
     )

@@ -35,8 +35,8 @@ def build_spark(metastore_uri: str, warehouse_dir: str) -> SparkSession:
         .config("spark.sql.catalogImplementation", "hive")
         .config("hive.metastore.uris", metastore_uri)
         .config("spark.sql.warehouse.dir", warehouse_dir)
-        .config("spark.sql.hive.metastore.version", "4.0.1")
-        .config("spark.sql.hive.metastore.jars", "maven")  # 在线拉取 Hive 4 依赖
+        .config("spark.sql.hive.metastore.version", "3.1.3")
+        .config("spark.sql.hive.metastore.jars", "maven")  # 在线拉取 Hive 依赖
         .config("spark.sql.sources.partitionOverwriteMode", "dynamic")
         .config("spark.sql.parquet.compression.codec", "snappy")
         .config("hive.metastore.schema.verification", "false")

@@ -16,8 +16,8 @@ Spark 批处理任务: 从 Kafka 摄取行为事件数据到 Hive 分区表 (p_d
 运行:
   docker exec spark-standalone /opt/spark/bin/spark-submit \
     --master spark://spark:7077 \
-    --packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.0,org.apache.spark:spark-token-provider-kafka-0-10_2.13:4.0.0,org.apache.kafka:kafka-clients:3.8.1,org.apache.commons:commons-pool2:2.12.0 \
-    --conf spark.sql.hive.metastore.version=4.0.1 \
+    --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.7,org.apache.kafka:kafka-clients:3.8.1,org.apache.commons:commons-pool2:2.12.0 \
+    --conf spark.sql.hive.metastore.version=3.1.3 \
     --conf spark.sql.hive.metastore.jars=maven \
     --conf spark.sql.catalogImplementation=hive \
     --conf spark.sql.warehouse.dir=jfs://feedjfs/warehouse \
@@ -25,7 +25,7 @@ Spark 批处理任务: 从 Kafka 摄取行为事件数据到 Hive 分区表 (p_d
     /opt/spark-apps/kafka2hive.py \
       --bootstrap-servers kafka:9093 \
       --topic action \
-      --p-date 20251109 \
+      --p-date 20251130 \
       --database dwd \
       --table action \
       --starting-offsets earliest \
@@ -99,8 +99,8 @@ def build_spark(app_name: str = "kafka2hive_action",
         .config("spark.sql.catalogImplementation", "hive")
         .config("spark.sql.sources.partitionOverwriteMode", "dynamic")
         .config("spark.sql.parquet.compression.codec", "snappy")
-        # Hive 4.0 Metastore 配置
-        .config("spark.sql.hive.metastore.version", "4.0.1")
+        # Hive 3.1.3 Metastore 配置
+        .config("spark.sql.hive.metastore.version", "3.1.3")
         .config("spark.sql.hive.metastore.jars", "maven")
     )
 

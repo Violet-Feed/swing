@@ -7,7 +7,7 @@ Spark 集群版本的初始化脚本：通过 spark-submit 在集群/standalone 
   docker cp etl/init-table-spark.py spark-standalone:/opt/spark-apps/
   docker exec spark-standalone /opt/spark/bin/spark-submit \
     --master spark://spark:7077 \
-    --conf spark.sql.hive.metastore.version=4.0.1 \
+    --conf spark.sql.hive.metastore.version=3.1.3 \
     --conf spark.sql.hive.metastore.jars=maven \
     --conf spark.sql.catalogImplementation=hive \
     --conf spark.sql.warehouse.dir=jfs://feedjfs/warehouse \
@@ -45,7 +45,7 @@ def build_spark(args) -> SparkSession:
         .config("spark.sql.catalogImplementation", "hive")
         .config("hive.metastore.uris", args.metastore_uri)
         .config("spark.sql.warehouse.dir", args.warehouse_dir)
-        .config("spark.sql.hive.metastore.version", "4.0.1")
+        .config("spark.sql.hive.metastore.version", "3.1.3")
         .config("spark.sql.hive.metastore.jars", "maven")
         .config("spark.sql.sources.partitionOverwriteMode", "dynamic")
         .config("spark.sql.parquet.compression.codec", "snappy")

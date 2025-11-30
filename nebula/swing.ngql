@@ -1,0 +1,17 @@
+ADD HOSTS "storaged0":9779
+:sleep 10;
+
+# Create Space 
+CREATE SPACE `swing0` (partition_num = 10, replica_factor = 1, charset = utf8, collate = utf8_bin, vid_type = INT64);
+:sleep 20;
+USE `swing0`;
+
+# Create Tag: 
+CREATE TAG `creation` ( `creation_id` int64 NOT NULL) ttl_duration = 0, ttl_col = "";
+
+# Create Edge: 
+CREATE EDGE `sim` ( `simscore` double NOT NULL) ttl_duration = 0, ttl_col = "";
+:sleep 20;
+
+# Create Index: 
+CREATE TAG INDEX `creation_id_index` ON `creation` ( `creation_id`);

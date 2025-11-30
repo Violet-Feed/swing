@@ -1,14 +1,14 @@
-# Spark 与 Hive 4 集成配置
+# Spark 与 Hive 3 集成配置
 
-本目录包含 Spark 连接到 Hive 4.0 Metastore 所需的配置文件。
+本目录包含 Spark 连接到 Hive 3.1.3 Metastore 所需的配置文件。
 
 ## 核心配置说明
 
 ### Spark 支持的 Hive 版本
 根据 [Spark 官方文档](https://spark.apache.org/docs/latest/sql-data-sources-hive-tables.html#interacting-with-different-versions-of-hive-metastore)，Spark 支持以下 Hive Metastore 版本：
 - Hive 2.0.0 - 2.3.10
-- Hive 3.0.0 - 3.1.3
-- **Hive 4.0.0 - 4.0.1** ✅
+- **Hive 3.0.0 - 3.1.3** ✅（推荐使用 3.1.3）
+- Hive 4.0.0 - 4.0.1
 
 ### 关键配置项
 
@@ -19,7 +19,7 @@
 ```xml
 <property>
   <name>spark.sql.hive.metastore.version</name>
-  <value>4.0.1</value>
+  <value>3.1.3</value>
 </property>
 ```
 
@@ -42,14 +42,14 @@
 Spark 的 Hive 配置文件，已包含以下关键配置：
 
 **核心配置：**
-- Metastore 版本: `4.0.1`
+- Metastore 版本: `3.1.3`
 - Metastore URI: `thrift://hive-metastore:9083`
 - Warehouse 目录: `jfs://feedjfs/warehouse`
 - JAR 包来源: `maven`（自动下载）
 - Catalog 实现: `hive`
 
 ### 3. test_hive_connection.py
-测试脚本，用于验证 Spark 与 Hive 4 的连接。
+测试脚本，用于验证 Spark 与 Hive 3 的连接。
 
 ## 使用方法
 
@@ -90,7 +90,7 @@ from pyspark.sql import SparkSession
 spark = SparkSession.builder \
     .appName("YourApp") \
     .config("spark.sql.catalogImplementation", "hive") \
-    .config("spark.sql.hive.metastore.version", "4.0.1") \
+    .config("spark.sql.hive.metastore.version", "3.1.3") \
     .config("spark.sql.hive.metastore.jars", "maven") \
     .config("hive.metastore.uris", "thrift://hive-metastore:9083") \
     .enableHiveSupport() \
@@ -108,7 +108,7 @@ spark.sql("SELECT * FROM test").show()
 ```bash
 spark-submit \
   --conf spark.sql.catalogImplementation=hive \
-  --conf spark.sql.hive.metastore.version=4.0.1 \
+  --conf spark.sql.hive.metastore.version=3.1.3 \
   --conf spark.sql.hive.metastore.jars=maven \
   --conf hive.metastore.uris=thrift://hive-metastore:9083 \
   your_script.py
@@ -122,28 +122,28 @@ spark-submit \
 IllegalArgumentException: '4.1.0' in spark.sql.hive.metastore.version is invalid. Unsupported Hive Metastore version
 ```
 
-**原因：** Spark 4.0.0 只支持 Hive 4.0.0-4.0.1，不支持 4.1.0。
+**原因：** Spark 默认不支持 4.1.0，当前配置请固定到受支持的 Hive 3.1.3。
 
 **解决方法：**
-1. 将 Hive Metastore 调整为 4.0.1（推荐）：
+1. 将 Hive Metastore 调整为 3.1.3（推荐）：
    ```yaml
    # docker-compose.yaml
    hive-metastore:
-     image: apache/hive:4.0.1
+     image: apache/hive:3.1.3
    ```
 
-2. 配置 Spark 使用 Hive 4.0.1：
+2. 配置 Spark 使用 Hive 3.1.3：
    ```xml
    <property>
      <name>spark.sql.hive.metastore.version</name>
-     <value>4.0.1</value>
+     <value>3.1.3</value>
    </property>
    ```
 
 ### 问题 2: Maven 下载 JAR 包失败
 **错误信息：**
 ```
-Failed to download org.apache.hive:hive-metastore:4.0.1
+Failed to download org.apache.hive:hive-metastore:3.1.3
 ```
 
 **解决方法：**
@@ -170,7 +170,7 @@ HiveException: Unable to fetch table action. Invalid method name: 'get_table'
 **解决方法：**
 确保配置了正确的版本：
 ```python
-.config("spark.sql.hive.metastore.version", "4.0.1")
+.config("spark.sql.hive.metastore.version", "3.1.3")
 .config("spark.sql.hive.metastore.jars", "maven")
 ```
 
@@ -214,5 +214,5 @@ spark = SparkSession.builder \
 ## 参考资源
 
 - [Apache Spark 官方文档](https://spark.apache.org/docs/latest/)
-- [Apache Hive 4 文档](https://hive.apache.org/)
+- [Apache Hive 文档](https://hive.apache.org/)
 - [Spark SQL with Hive](https://spark.apache.org/docs/latest/sql-data-sources-hive-tables.html)
