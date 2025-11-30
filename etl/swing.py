@@ -24,16 +24,16 @@ Swing 协同过滤推荐算法 - 高性能优化版本
 运行:
   docker exec spark-standalone /opt/spark/bin/spark-submit \
     --master spark://spark:7077 \
-    --conf spark.sql.hive.metastore.version=4.0.1 \
+    --conf spark.sql.hive.metastore.version=3.1.3 \
     --conf spark.sql.hive.metastore.jars=maven \
     --conf spark.sql.catalogImplementation=hive \
     --conf spark.sql.warehouse.dir=jfs://feedjfs/warehouse \
     --conf hive.metastore.uris=thrift://hive-metastore:9083 \
     /opt/spark-apps/swing.py \
       --src-db dwd \
-      --src-table click7aggre1 \
+      --src-table click7aggre \
       --dst-db dwd \
-      --dst-table swing2 \
+      --dst-table swing \
       --alpha 1.0 \
       --top-k 100 \
       --user-cap 200
@@ -59,6 +59,7 @@ try:
 except ImportError:
     print("pandas not found, installing...")
     import subprocess
+    # 这里会出问题，暂且不知道原因，需要容器内手动安装pandas
     subprocess.check_call([sys.executable, "-m", "pip3", "install", "pandas", "pyarrow", "--break-system-packages"])
     import pandas as pd
 
@@ -95,7 +96,7 @@ def main(argv=None):
         .config("spark.sql.parquet.compression.codec", "snappy")
         .config("hive.metastore.uris", args.metastore_uri)
         .config("spark.sql.warehouse.dir", args.warehouse_dir)
-        .config("spark.sql.hive.metastore.version", "4.0.1")
+        .config("spark.sql.hive.metastore.version", "3.1.3")
         .config("spark.sql.hive.metastore.jars", "maven")
         .config("hive.metastore.schema.verification", "false")
     )

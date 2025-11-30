@@ -1,0 +1,166 @@
+Log file created at: 2025/11/30 07:59:29
+Running on machine: 503e29add6fb
+Running duration (h:mm:ss): 0:00:00
+Log line format: [IWEF]yyyymmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I20251130 07:59:29.284801     1 MetaDaemon.cpp:137] localhost = "metad0":9559
+I20251130 07:59:29.288419     1 NebulaStore.cpp:48] Start the raft service...
+I20251130 07:59:29.288987     1 NebulaSnapshotManager.cpp:25] Send snapshot is rate limited to 10485760 for each part by default
+I20251130 07:59:29.441313     1 RaftexService.cpp:46] Start raft service on 9560
+I20251130 07:59:29.441493     1 NebulaStore.cpp:82] Scan the local path, and init the spaces_
+I20251130 07:59:29.441598     1 NebulaStore.cpp:90] Scan path "/data/meta/nebula/0"
+I20251130 07:59:29.441617     1 NebulaStore.cpp:292] Init data from partManager for "metad0":9559
+I20251130 07:59:29.441623     1 NebulaStore.cpp:417] Create data space 0
+I20251130 07:59:29.455026    75 RocksEngine.cpp:107] open rocksdb on /data/meta/nebula/0/data
+I20251130 07:59:29.503499     1 NebulaStore.cpp:480] Space 0, part 0 has been added, asLearner 0
+I20251130 07:59:29.503558     1 NebulaStore.cpp:75] Register handler...
+I20251130 07:59:29.503563     1 MetaDaemonInit.cpp:106] Waiting for the leader elected...
+I20251130 07:59:29.503566     1 MetaDaemonInit.cpp:118] Leader has not been elected, sleep 1s
+I20251130 07:59:30.503775     1 MetaDaemonInit.cpp:153] Get meta version is 4
+I20251130 07:59:30.503839     1 MetaDaemonInit.cpp:169] Nebula store init succeeded, clusterId 5761718673752750519
+I20251130 07:59:30.503844     1 MetaDaemon.cpp:150] Start http service
+I20251130 07:59:30.504043     1 MetaDaemonInit.cpp:226] Starting Meta HTTP Service
+I20251130 07:59:30.519068    98 WebService.cpp:124] Web service started on HTTP[19559]
+I20251130 07:59:30.519147     1 MetaDaemonInit.cpp:192] Check root user
+I20251130 07:59:30.519207     1 RootUserMan.h:35] God user exists
+I20251130 07:59:30.521220     1 MetaDaemon.cpp:193] The meta daemon start on "metad0":9559
+I20251130 07:59:30.521386     1 JobManager.cpp:64] JobManager initialized
+I20251130 07:59:30.521442   104 JobManager.cpp:150] JobManager::scheduleThread enter
+I20251130 07:59:31.423629   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:31.423717   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:32.426003   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:32.426138   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:32.752486   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 07:59:32.752578   130 HBProcessor.cpp:89] Update host "graphd":9669 dir info, root path: /usr/local/nebula, data path size: 0
+I20251130 07:59:32.798489   130 SessionManagerProcessor.cpp:150] resp session size: 0
+I20251130 07:59:32.810853   130 SessionManagerProcessor.cpp:150] resp session size: 0
+I20251130 07:59:33.430903   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:33.430994   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:34.434688   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:34.434837   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:41.558008   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 07:59:42.666186   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:42.666359   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:43.668190   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:43.668285   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:44.671228   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:44.671310   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:45.672631   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:45.672706   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:51.575116   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 07:59:55.676314   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:55.676469   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:56.679322   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:56.679517   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:57.682153   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:57.682329   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 07:59:58.684676   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 07:59:58.684840   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:01.593863   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:00:06.924558   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:06.924644   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:07.952327   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:07.952497   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:08.957454   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:08.957543   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:09.834985   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:00:09.962425   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:09.962530   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:19.844877   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:00:19.972148   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:19.972308   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:20.976895   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:20.977028   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:21.980913   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:21.981001   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:22.982753   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:22.982847   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:29.858642   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:00:32.984578   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:32.984660   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:33.989205   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:33.989358   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:34.991847   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:34.991935   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:34.221012   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:34.221103   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:38.091315   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:00:44.222884   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:44.222980   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:45.247658   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:45.247751   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:46.254729   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:46.254835   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:47.267673   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:47.267771   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:48.097707   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:00:57.278357   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:57.278460   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:58.109158   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:00:58.280952   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:58.281044   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:00:59.286396   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:00:59.286525   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:00.289608   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:00.289690   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:06.338340   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:01:08.518422   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:08.518616   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:09.520361   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:09.520470   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:10.525035   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:10.525144   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:11.527309   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:11.527400   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:16.349336   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:01:21.529671   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:21.529758   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:22.541474   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:22.541617   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:23.545073   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:23.545179   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:24.547242   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:24.547333   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:26.354976   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:01:32.785368   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:32.785446   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:33.787118   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:33.787223   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:34.592543   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:01:34.789137   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:34.789320   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:35.791262   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:35.791366   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:44.599030   130 HBProcessor.cpp:33] Receive heartbeat from "graphd":9669, role = GRAPH
+I20251130 08:01:45.793540   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:45.793637   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:46.794593   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:46.794687   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:47.798985   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:47.799095   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:48.804848   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:48.804930   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:53.202245   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:53.202526   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:54.205979   130 HBProcessor.cpp:33] Receive heartbeat from "storaged0":9779, role = STORAGE
+I20251130 08:01:54.206056   130 HBProcessor.cpp:41] Machine "storaged0":9779 is not registered
+I20251130 08:01:55.997542     1 MetaDaemon.cpp:230] Signal 15(Terminated) received, stopping this server
+I20251130 08:01:56.005475     1 JobManager.cpp:138] JobManager::shutDown() begin
+I20251130 08:01:56.006943   104 JobManager.cpp:155] Detect shutdown called, exit
+I20251130 08:01:56.007136   104 JobDescription.cpp:113] Loading job description failed, error: E_JOB_NOT_IN_SPACE
+I20251130 08:01:56.007184   104 JobManager.cpp:175] Load an invalid job from space 0 jodId 0
+I20251130 08:01:56.007299     1 JobManager.cpp:146] JobManager::shutDown() end
+I20251130 08:01:56.007337     1 NebulaStore.cpp:343] Stop the raft service...
+I20251130 08:01:56.007344     1 RaftexService.cpp:67] Stopping the raftex service on port 9560
+I20251130 08:01:56.007349     1 RaftexService.cpp:77] All partitions have stopped
+I20251130 08:01:56.007380     1 NebulaStore.cpp:346] Stop kv engine...
+I20251130 08:01:56.007613     1 NebulaStore.cpp:343] Stop the raft service...
+I20251130 08:01:56.007628     1 RaftexService.cpp:67] Stopping the raftex service on port 9560
+I20251130 08:01:56.007632     1 RaftexService.cpp:77] All partitions have stopped
+I20251130 08:01:56.007635     1 NebulaStore.cpp:346] Stop kv engine...
+I20251130 08:01:56.007654     1 NebulaStore.cpp:36] Cut off the relationship with meta client
+I20251130 08:01:56.008240     1 Part.h:59] [Port: 9560, Space: 0, Part: 0] ~Part()
+I20251130 08:01:56.008985     1 RocksEngine.h:247] Release rocksdb on /data/meta/nebula/0
+I20251130 08:01:56.009346     1 NebulaStore.cpp:44] ~NebulaStore()
+I20251130 08:01:56.009433     1 MetaDaemon.cpp:215] The meta Daemon stopped
+I20251130 08:01:56.011032     1 JobManager.cpp:138] JobManager::shutDown() begin
+I20251130 08:01:56.011066     1 JobManager.cpp:141] JobManager not running, exit

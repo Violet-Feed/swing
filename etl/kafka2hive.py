@@ -6,8 +6,8 @@ Kafka -> Hive 批处理 ETL
 Spark 批处理任务: 从 Kafka 摄取行为事件数据到 Hive 分区表 (p_date)。
 
 - 读取指定日期的 Kafka 记录（可配置偏移量），解析 JSON 数据。
+- 针对新格式消息（userId + actionTypeList/creationIdList/timestampList），拆分逗号串并按索引对齐展开。
 - 将 action_ts 字段标准化为 Spark TimestampType（支持 ISO 字符串或 epoch 秒/毫秒）。
-- 处理可能包含逗号分隔 ID 的 creation_id：拆分并展开为多行。
 - 写入 Hive 表 `action`（数据库可配置），按 p_date（字符串 yyyyMMdd）分区。
 
 部署:
@@ -16,8 +16,8 @@ Spark 批处理任务: 从 Kafka 摄取行为事件数据到 Hive 分区表 (p_d
 运行:
   docker exec spark-standalone /opt/spark/bin/spark-submit \
     --master spark://spark:7077 \
-    --packages org.apache.spark:spark-sql-kafka-0-10_2.13:4.0.0,org.apache.spark:spark-token-provider-kafka-0-10_2.13:4.0.0,org.apache.kafka:kafka-clients:3.8.1,org.apache.commons:commons-pool2:2.12.0 \
-    --conf spark.sql.hive.metastore.version=4.0.1 \
+    --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.7,org.apache.kafka:kafka-clients:3.8.1,org.apache.commons:commons-pool2:2.12.0 \
+    --conf spark.sql.hive.metastore.version=3.1.3 \
     --conf spark.sql.hive.metastore.jars=maven \
     --conf spark.sql.catalogImplementation=hive \
     --conf spark.sql.warehouse.dir=jfs://feedjfs/warehouse \
@@ -25,7 +25,7 @@ Spark 批处理任务: 从 Kafka 摄取行为事件数据到 Hive 分区表 (p_d
     /opt/spark-apps/kafka2hive.py \
       --bootstrap-servers kafka:9093 \
       --topic action \
-      --p-date 20251109 \
+      --p-date 20251130 \
       --database dwd \
       --table action \
       --starting-offsets earliest \
@@ -100,8 +100,8 @@ def build_spark(app_name: str = "kafka2hive_action",
         .config("spark.sql.catalogImplementation", "hive")
         .config("spark.sql.sources.partitionOverwriteMode", "dynamic")
         .config("spark.sql.parquet.compression.codec", "snappy")
-        # Hive 4.0 Metastore 配置
-        .config("spark.sql.hive.metastore.version", "4.0.1")
+        # Hive 3.1.3 Metastore 配置
+        .config("spark.sql.hive.metastore.version", "3.1.3")
         .config("spark.sql.hive.metastore.jars", "maven")
     )
 
@@ -147,73 +147,69 @@ def init_table(spark: SparkSession, db: str, table: str):
 
 
 def parse_json(df_json):
-    """解析 Kafka JSON 数据并标准化字段。
+    """解析新格式 Kafka JSON 数据并标准化字段。
 
-    返回包含以下列的 DataFrame: user_id (long), action_ts (timestamp), action_type (int),
-    creation_id (string)。
+    新格式示例:
+    {"actionTypeList":"1,1","creationIdList":"111,222","timestampList":"111,222","userId":1981463119351775232}
+
+    返回列: user_id (long), action_ts (timestamp), action_type (int), creation_id (string)。
     """
+    def parse_ts(col):
+        """支持 epoch 秒/毫秒 或 ISO 字符串 -> timestamp"""
+        ts_num = col.cast("bigint")
+        ts_epoch = F.when(ts_num.isNotNull(),
+                          F.when(ts_num > F.lit(9999999999), (ts_num / F.lit(1000)).cast("double"))
+                          .otherwise(ts_num.cast("double")))
+        ts_epoch = F.when(ts_num.isNotNull(), F.to_timestamp(F.from_unixtime(ts_epoch)))
+        ts_str = F.to_timestamp(col)
+        return F.coalesce(ts_epoch, ts_str)
+
+    def split_and_clean(colname: str):
+        """按逗号拆分字符串，去掉空白与空元素"""
+        return F.filter(
+            F.transform(
+                F.split(F.coalesce(F.col(colname), F.lit("")), "\\s*,\\s*"),
+                lambda x: F.when(F.length(F.trim(x)) == 0, None).otherwise(F.trim(x))
+            ),
+            lambda x: x.isNotNull()
+        )
+
     schema = T.StructType([
-        T.StructField("user_id", T.LongType()),
-        # action_ts 允许字符串或数字（稍后解析）
-        T.StructField("action_ts", T.StringType()),
-        T.StructField("action_type", T.IntegerType()),
-        # creation_id 先作为字符串处理，以支持逗号分隔的值或纯数字字符串
-        T.StructField("creation_id", T.StringType()),
+        T.StructField("userId", T.LongType()),
+        T.StructField("actionTypeList", T.StringType()),
+        T.StructField("creationIdList", T.StringType()),
+        T.StructField("timestampList", T.StringType()),
     ])
 
     parsed = df_json.select(F.from_json(F.col("json_str"), schema, {"mode": "PERMISSIVE"}).alias("data"), F.col("json_str"))
     good = parsed.select("data.*").where(F.col("data").isNotNull())
 
-    # 标准化 action_ts: 支持 epoch 秒、epoch 毫秒或 ISO 字符串
-    # 尝试数字解析（epoch）
-    ts_num = F.col("action_ts").cast("bigint")
-    ts_epoch = F.when(ts_num.isNotNull(),
-                      F.when(ts_num > F.lit(9999999999),  # > 10 位数 => 毫秒
-                             (ts_num / F.lit(1000)).cast("double"))
-                      .otherwise(ts_num.cast("double")))
-    ts_epoch = F.when(ts_num.isNotNull(), F.to_timestamp(F.from_unixtime(ts_epoch))).otherwise(F.lit(None).cast("timestamp"))
+    base = (
+        good
+        .withColumn("user_id", F.col("userId").cast("long"))
+        .withColumn("action_type_arr", split_and_clean("actionTypeList"))
+        .withColumn("creation_id_arr", split_and_clean("creationIdList"))
+        .withColumn("action_ts_arr", split_and_clean("timestampList"))
+        .withColumn("zipped", F.arrays_zip("action_ts_arr", "action_type_arr", "creation_id_arr"))
+    )
 
-    # 尝试 ISO/datetime 字符串解析
-    ts_str = F.to_timestamp(F.col("action_ts"))
-
-    ts_final = F.coalesce(ts_epoch, ts_str)
+    exploded = base.withColumn("item", F.explode_outer("zipped"))
 
     normalized = (
-        good
-        .withColumn("action_ts", ts_final)
-        .withColumn("action_type", F.col("action_type").cast("int"))
-        .withColumn("user_id", F.col("user_id").cast("long"))
-        .withColumn("creation_id", F.col("creation_id").cast("string"))
+        exploded
+        .select(
+            "user_id",
+            F.col("item.action_ts_arr").alias("action_ts_str"),
+            F.col("item.action_type_arr").alias("action_type_str"),
+            F.col("item.creation_id_arr").alias("creation_id_str"),
+        )
+        .withColumn("action_ts", parse_ts(F.col("action_ts_str")))
+        .withColumn("action_type", F.col("action_type_str").cast("int"))
+        .withColumn("creation_id", F.regexp_replace(F.col("creation_id_str"), "\\s", "").cast("long"))
+        .drop("action_ts_str", "action_type_str", "creation_id_str")
     )
 
     return normalized
-
-
-def explode_cid(df):
-    """拆分逗号分隔的 creation_id 为多行并转换为 BIGINT。
-
-    规则:
-    - 如果 creation_id 包含 ','，按逗号拆分（忽略周围空格）并展开。
-    - 否则视为单元素数组。
-    - 去除空白字符；删除空字符串；转换为 BIGINT（null 保持 null）。
-    """
-    # 如果 creation_id 包含逗号 -> 按逗号拆分（去除空格）；否则包装为单元素数组
-    cid_array = F.when(
-        F.col("creation_id").isNull(), F.array(F.lit(None).cast("string"))
-    ).otherwise(
-        F.when(F.instr(F.col("creation_id"), F.lit(",")) > 0,
-               F.split(F.col("creation_id"), "\\s*,\\s*")
-        ).otherwise(F.array(F.col("creation_id")))
-    )
-
-    exploded = df.withColumn("cid", F.explode_outer(cid_array))
-    cleaned = exploded.withColumn("cid", F.regexp_replace(F.col("cid"), "\\s", ""))
-
-    # 空字符串 -> null
-    cleaned = cleaned.withColumn("creation_id", F.when(F.col("cid") == "", None).otherwise(F.col("cid")).cast("long"))
-    cleaned = cleaned.drop("cid")
-
-    return cleaned
 
 
 def main(argv=None):
@@ -252,12 +248,9 @@ def main(argv=None):
     # 解析并标准化
     parsed = parse_json(df_json)
 
-    # 展开 creation_id 列表
-    exploded = explode_cid(parsed)
-
     # 添加分区列
     final = (
-        exploded
+        parsed
         .withColumn("p_date", F.lit(args.p_date))
         .select("user_id", "action_ts", "action_type", "creation_id", "p_date")
     )

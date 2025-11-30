@@ -58,6 +58,12 @@
     <description>Hive metastore URI</description>
   </property>
 
+  <property>
+    <name>hive.metastore.local</name>
+    <value>false</value>
+    <description>Force using remote metastore instead of embedded Derby</description>
+  </property>
+
   <!-- HiveServer2 Configuration -->
   <property>
     <name>hive.server2.thrift.bind.host</name>
